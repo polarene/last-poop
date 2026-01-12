@@ -6,9 +6,13 @@ Live demo: https://polarene.github.io/last-poop/
 
 ## Install on phone
 
-### Android (Chrome)
-- Open the URL in Chrome.
+### Android (Chrome / Edge)
+- Open the URL in Chrome or Edge.
 - Menu ⋮ → Install app / Add to Home screen.
+
+### Android (Firefox)
+- Menu ⋮ → Add to Home screen.
+- Note: Firefox may create a shortcut (not a standalone "installed app") and on some launchers it may not appear as an app.
 
 ### iPhone (Safari)
 - Open the URL in Safari.
