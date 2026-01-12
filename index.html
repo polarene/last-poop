@@ -66,37 +66,68 @@
             text-transform: capitalize;
         }
 
-        .poop-button {
-            font-size: 5rem;
-            background: white;
+        .circle-button {
             border: none;
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
+            border-radius: 9999px;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
-            padding: 0;
+
             display: inline-flex;
             align-items: center;
             justify-content: center;
+
+            padding: 0;
             overflow: hidden;
+            user-select: none;
+
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .poop-button img {
+        .circle-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .circle-button:active {
+            transform: scale(0.95);
+        }
+
+        #poop-button {
+            background: white;
+            width: 150px;
+            height: 150px;
+        }
+
+        #poop-button img {
             width: 70%;
             height: 70%;
             object-fit: contain;
             display: block;
         }
 
-        .poop-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        #cancel-button {
+            width: 75px;
+            height: 75px;
+            margin-top: 14px;
+            /* light gray */
+            background: #e0e0e0;
+            /* make emoji centering consistent across fonts */
+            font-size: 2.2rem;
+            line-height: 1;
         }
 
-        .poop-button:active {
-            transform: scale(0.95);
+        #cancel-button > span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            line-height: 1;
+        }
+
+        /* slightly milder hover for the small button */
+        #cancel-button:hover {
+            transform: scale(1.06);
         }
 
         .date-row {
@@ -198,8 +229,12 @@
         </div>
     </div>
 
-    <button class="poop-button" @click="trackPoop()" title="Registra cacca!">
+    <button id="poop-button" class="circle-button" @click="trackPoop()" title="Registra cacca!">
         <img src="icon-192.png" alt="💩">
+    </button>
+
+    <button id="cancel-button" class="circle-button" @click="clearPoop()" title="Cancella dato" aria-label="Cancella dato">
+        <span aria-hidden="true">❌</span>
     </button>
 
     <script>
@@ -251,6 +286,14 @@
                     this.updateDisplay();
                 },
 
+                clearPoop() {
+                    localStorage.removeItem(STORAGE_KEY);
+                    this.lastPoopDay = null;
+                    this.editDay = '';
+                    this.showCorrect = false;
+                    this.updateDisplay();
+                },
+
                 openCorrect(evt) {
                     // remove focus ring on the icon after click
                     if (evt && evt.currentTarget && typeof evt.currentTarget.blur === 'function') {
@@ -282,9 +325,8 @@
                     this.showCorrect = false;
 
                     const input = this.$refs.datePicker;
-                    if (input) {
-                        input.classList.remove('is-open');
-                        if (typeof input.blur === 'function') input.blur();
+                    if (input && typeof input.blur === 'function') {
+                        input.blur();
                     }
                 },
 
@@ -295,24 +337,22 @@
                         return;
                     }
 
-                    const last = fromYmdLocal(this.lastPoopDay);
-                    const today = startOfToday();
-                    const days = diffDays(last, today);
+                    const lastDate = fromYmdLocal(this.lastPoopDay);
+                    const diff = diffDays(lastDate, startOfToday());
 
-                    if (days <= 0) this.elapsedText = 'Oggi';
-                    else if (days === 1) this.elapsedText = 'Ieri';
-                    else this.elapsedText = `${days} giorni fa`;
+                    if (diff <= 0) this.elapsedText = 'Oggi';
+                    else if (diff === 1) this.elapsedText = 'Ieri';
+                    else this.elapsedText = `${diff} giorni fa`;
 
-                    this.formattedDate = last.toLocaleDateString('it-IT', {
+                    this.formattedDate = lastDate.toLocaleDateString('it-IT', {
                         weekday: 'long',
-                        year: 'numeric',
+                        day: 'numeric',
                         month: 'long',
-                        day: 'numeric'
+                        year: 'numeric'
                     });
                 }
-            }
+            };
         }
     </script>
 </body>
 </html>
-
