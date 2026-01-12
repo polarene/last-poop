@@ -1,6 +1,6 @@
 # Ultima Cacca
 
-Mini client-only webapp (single page) to record the date of Susanna’s last poop.
+Mini client-only webapp to record the date of Susanna’s last poop.
 
 Live demo: https://polarene.github.io/last-poop/
 
