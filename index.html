@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultima Cacca</title>
+    <meta name="theme-color" content="#b2ebf2">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="site.webmanifest">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            /* bathroom tiles (SVG pattern) */
+            --tile-size: 50px;
+            --grout-color: #b2ebf2;  /* grout */
+
+            background-color: var(--grout-color);
+
+            /* SVG tile: a single rounded square inset in a grout-colored cell */
+            background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='50'%20height='50'%20viewBox='0%200%2050%2050'%3E%3Crect%20width='50'%20height='50'%20fill='%23b2ebf2'/%3E%3Crect%20x='1'%20y='1'%20width='48'%20height='48'%20rx='6'%20ry='6'%20fill='%23f4feff'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: var(--tile-size) var(--tile-size);
+
+            color: #5D4037;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-box {
+            background: white;
+            border: 2px solid #5D4037;
+            border-radius: 20px;
+            padding: 1.5rem 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .elapsed-time {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .date {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            text-transform: capitalize;
+        }
+
+        .poop-button {
+            font-size: 5rem;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .poop-button img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .poop-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .poop-button:active {
+            transform: scale(0.95);
+        }
+
+        .date-row {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .edit-icon {
+            appearance: none;
+            border: none;
+            background: transparent;
+            color: inherit;
+            border-radius: 8px;
+            padding: 0.2rem 0.35rem;
+            line-height: 1;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .edit-icon:hover {
+            transform: translateY(-1px);
+            background-color: rgba(93, 64, 55, 0.06);
+        }
+
+        .edit-icon:active {
+            transform: translateY(0);
+            background-color: rgba(93, 64, 55, 0.10);
+        }
+
+        .edit-icon:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .edit-icon:focus-visible {
+            box-shadow: 0 0 0 3px rgba(93, 64, 55, 0.15);
+        }
+
+        /* keep the input anchored for native picker, but not visible */
+        .date-input {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translate(110%, -50%);
+
+            /* not visible */
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: 0;
+            border: 0;
+            opacity: 0;
+            pointer-events: none;
+
+            background: transparent;
+        }
+
+        /* when we need a fallback interaction, make it clickable (still visually invisible) */
+        .date-input.is-open {
+            pointer-events: auto;
+        }
+
+        .date-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(93, 64, 55, 0.15);
+        }
+    </style>
+</head>
+<body x-data="poopTracker()">
+    <h1>Ultima Cacca di Susanna</h1>
+
+    <div class="info-box">
+        <div class="elapsed-time" x-text="elapsedText"></div>
+        <div class="date-row">
+            <div class="date" x-text="formattedDate"></div>
+            <button
+                x-show="!!formattedDate"
+                class="edit-icon"
+                type="button"
+                title="Modifica data"
+                aria-label="Modifica data"
+                @click="openCorrect($event)"
+            >✍️</button>
+
+            <input
+                class="date-input"
+                :class="showCorrect ? 'is-open' : ''"
+                type="date"
+                x-ref="datePicker"
+                x-model="editDay"
+                :max="maxDay"
+                @change="applyCorrect()"
+                aria-label="Seleziona una data"
+            />
+        </div>
+    </div>
+
+    <button class="poop-button" @click="trackPoop()" title="Registra cacca!">
+        <img src="icon-192.png" alt="💩">
+    </button>
+
+    <script>
+        function poopTracker() {
+            const STORAGE_KEY = 'lastPoopDay'; // YYYY-MM-DD
+
+            const pad2 = (n) => String(n).padStart(2, '0');
+
+            const toYmd = (d) => {
+                // local date (no timezone surprises)
+                return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+            };
+
+            const fromYmdLocal = (ymd) => {
+                const [y, m, day] = ymd.split('-').map(Number);
+                // midnight local time
+                return new Date(y, m - 1, day);
+            };
+
+            const startOfToday = () => {
+                const now = new Date();
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            };
+
+            const diffDays = (fromDay, toDay) => {
+                const ms = toDay.getTime() - fromDay.getTime();
+                return Math.round(ms / 86400000);
+            };
+
+            return {
+                lastPoopDay: null, // YYYY-MM-DD
+                editDay: '', // YYYY-MM-DD (for date input)
+                maxDay: toYmd(new Date()),
+                showCorrect: false,
+                elapsedText: '',
+                formattedDate: '',
+
+                init() {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) this.lastPoopDay = saved;
+                    this.editDay = this.lastPoopDay || '';
+                    this.updateDisplay();
+                },
+
+                trackPoop() {
+                    this.lastPoopDay = toYmd(new Date());
+                    localStorage.setItem(STORAGE_KEY, this.lastPoopDay);
+                    this.editDay = this.lastPoopDay;
+                    this.updateDisplay();
+                },
+
+                openCorrect(evt) {
+                    // remove focus ring on the icon after click
+                    if (evt && evt.currentTarget && typeof evt.currentTarget.blur === 'function') {
+                        evt.currentTarget.blur();
+                    }
+
+                    this.editDay = this.lastPoopDay || this.maxDay;
+                    this.showCorrect = true;
+
+                    this.$nextTick(() => {
+                        const input = this.$refs.datePicker;
+                        if (!input) return;
+
+                        if (typeof input.showPicker === 'function') {
+                            input.showPicker();
+                        } else {
+                            input.classList.add('is-open');
+                            input.focus();
+                            input.click();
+                        }
+                    });
+                },
+
+                applyCorrect() {
+                    if (!this.editDay) return;
+                    this.lastPoopDay = this.editDay;
+                    localStorage.setItem(STORAGE_KEY, this.lastPoopDay);
+                    this.updateDisplay();
+                    this.showCorrect = false;
+
+                    const input = this.$refs.datePicker;
+                    if (input) {
+                        input.classList.remove('is-open');
+                        if (typeof input.blur === 'function') input.blur();
+                    }
+                },
+
+                updateDisplay() {
+                    if (!this.lastPoopDay) {
+                        this.elapsedText = 'Nessuna cacca registrata';
+                        this.formattedDate = '';
+                        return;
+                    }
+
+                    const last = fromYmdLocal(this.lastPoopDay);
+                    const today = startOfToday();
+                    const days = diffDays(last, today);
+
+                    if (days <= 0) this.elapsedText = 'Oggi';
+                    else if (days === 1) this.elapsedText = 'Ieri';
+                    else this.elapsedText = `${days} giorni fa`;
+
+                    this.formattedDate = last.toLocaleDateString('it-IT', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
