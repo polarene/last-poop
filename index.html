@@ -225,13 +225,21 @@
 
         /* hide x-cloak elements until Alpine is ready */
         [x-cloak] { display: none !important; }
+
+        .elapsed-time.status--warn {
+            color: #e67e22;
+        }
+
+        .elapsed-time.status--danger {
+            color: #c0392b;
+        }
     </style>
 </head>
 <body x-data="poopTracker()">
     <h1>Ultima Cacca di Susanna</h1>
 
     <div class="info-box">
-        <div class="elapsed-time" x-text="elapsedText"></div>
+        <div class="elapsed-time" :class="statusClass" x-text="elapsedText"></div>
         <div class="date-row">
             <div class="date" x-text="formattedDate"></div>
             <button
@@ -305,6 +313,7 @@
                 showCorrect: false,
                 elapsedText: '',
                 formattedDate: '',
+                statusClass: '',
 
                 init() {
                     const saved = localStorage.getItem(STORAGE_KEY);
@@ -368,6 +377,8 @@
                 },
 
                 updateDisplay() {
+                    this.statusClass = '';
+
                     if (!this.lastPoopDay) {
                         this.elapsedText = 'Nessuna cacca registrata';
                         this.formattedDate = '';
@@ -380,6 +391,9 @@
                     if (diff <= 0) this.elapsedText = 'Oggi';
                     else if (diff === 1) this.elapsedText = 'Ieri';
                     else this.elapsedText = `${diff} giorni fa`;
+
+                    if (diff === 3) this.statusClass = 'status--warn';
+                    else if (diff >= 4) this.statusClass = 'status--danger';
 
                     this.formattedDate = lastDate.toLocaleDateString('it-IT', {
                         weekday: 'long',
