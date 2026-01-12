@@ -198,6 +198,33 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(93, 64, 55, 0.15);
         }
+
+        .button-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #date-button {
+            width: 92px;
+            height: 92px;
+            background: white;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        #date-button > span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            line-height: 1;
+        }
+
+        /* hide x-cloak elements until Alpine is ready */
+        [x-cloak] { display: none !important; }
     </style>
 </head>
 <body x-data="poopTracker()">
@@ -209,6 +236,7 @@
             <div class="date" x-text="formattedDate"></div>
             <button
                 x-show="!!formattedDate"
+                x-cloak
                 class="edit-icon"
                 type="button"
                 title="Modifica data"
@@ -229,13 +257,19 @@
         </div>
     </div>
 
-    <button id="poop-button" class="circle-button" @click="trackPoop()" title="Registra cacca!">
-        <img src="icon-192.png" alt="💩">
-    </button>
+    <div class="button-stack">
+        <button id="poop-button" class="circle-button" @click="trackPoop()" title="Cacca oggi!">
+            <img src="icon-192.png" alt="💩">
+        </button>
 
-    <button id="cancel-button" class="circle-button" @click="clearPoop()" title="Cancella dato" aria-label="Cancella dato">
-        <span aria-hidden="true">❌</span>
-    </button>
+        <button x-show="!formattedDate" x-cloak id="date-button" class="circle-button" type="button" @click="openCorrect($event)" title="Imposta una data" aria-label="Imposta una data">
+            <span aria-hidden="true">📅</span>
+        </button>
+
+        <button x-show="!!formattedDate" x-cloak id="cancel-button" class="circle-button" @click="clearPoop()" title="Cancella dato" aria-label="Cancella dato">
+            <span aria-hidden="true">❌</span>
+        </button>
+    </div>
 
     <script>
         function poopTracker() {
@@ -325,8 +359,11 @@
                     this.showCorrect = false;
 
                     const input = this.$refs.datePicker;
-                    if (input && typeof input.blur === 'function') {
-                        input.blur();
+                    if (input) {
+                        input.classList.remove('is-open');
+                        if (typeof input.blur === 'function') {
+                            input.blur();
+                        }
                     }
                 },
 
