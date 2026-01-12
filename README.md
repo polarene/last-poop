@@ -1,27 +1,15 @@
 # Ultima Cacca
 
-Mini webapp client-only (una singola pagina) per segnare la data dell’ultima cacca di Susanna.
+Mini client-only webapp (single page) to record the date of Susanna’s last poop.
 
-## Pubblicazione su GitHub Pages
+Live demo: https://polarene.github.io/last-poop/
 
-1. Crea un repository su GitHub (es. `ultima-cacca`).
-2. Metti questi file nella root del repository (come sono qui).
-3. Attiva GitHub Pages:
-   - Repository → **Settings** → **Pages**
-   - **Build and deployment** → Source: **Deploy from a branch**
-   - Branch: `main` / folder: `/ (root)`
-4. Apri l’URL di Pages dal telefono.
-
-## Installazione sul telefono "tipo app"
+## Install on phone
 
 ### Android (Chrome)
-- Apri l’URL su Chrome.
-- Menu ⋮ → **Installa app** / **Aggiungi a schermata Home**.
+- Open the URL in Chrome.
+- Menu ⋮ → Install app / Add to Home screen.
 
 ### iPhone (Safari)
-- Apri l’URL su Safari.
-- Condividi → **Aggiungi a Home**.
-
-## Nota su offline
-
-Senza service worker l’installazione/“aggiungi a home” può comunque funzionare, ma l’offline non è garantito in modo affidabile: se vuoi offline sicuro, serve aggiungere un service worker (non incluso qui).
+- Open the URL in Safari.
+- Share → Add to Home Screen.
