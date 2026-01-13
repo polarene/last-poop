@@ -233,6 +233,36 @@
         .elapsed-time.status--danger {
             color: #c0392b;
         }
+
+        .github-link {
+            position: fixed;
+            --pos: 16px;
+            right: var(--pos);
+            bottom: var(--pos);
+            --size: 48px;
+            width: var(--size);
+            height: var(--size);
+            border-radius: 9999px;
+            background: white;
+            color: var(--title-color);
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            z-index: 20;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .github-link img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: relative;
+        }
+
+        .github-link:focus {
+            outline: none;
+        }
     </style>
 </head>
 <body x-data="poopTracker()">
@@ -278,6 +308,11 @@
             <span aria-hidden="true">❌</span>
         </button>
     </div>
+
+    <a href="https://github.com/mmirk/ultima-cacca" class="github-link" target="_blank"
+        rel="noopener noreferrer" aria-label="Vedi su GitHub" title="Vedi su GitHub">
+      <img src="GitHub_Invertocat_Dark.svg" alt="GitHub" />
+    </a>
 
     <script>
         function poopTracker() {
